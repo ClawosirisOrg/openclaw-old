@@ -17,12 +17,18 @@ describe("tool mutation helpers", () => {
       });
     },
   );
-  it("treats session_status as mutating only when model override is provided", () => {
+  it("treats session_status as mutating only when a session override is provided", () => {
     expect(isMutatingToolCall("session_status", { sessionKey: "agent:main:main" })).toBe(false);
     expect(
       isMutatingToolCall("session_status", {
         sessionKey: "agent:main:main",
         model: "openai/gpt-4o",
+      }),
+    ).toBe(true);
+    expect(
+      isMutatingToolCall("session_status", {
+        sessionKey: "agent:main:main",
+        thinkingLevel: "high",
       }),
     ).toBe(true);
   });

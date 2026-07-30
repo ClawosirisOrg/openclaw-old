@@ -124,7 +124,12 @@ type SessionPatchProjectionParams = {
 };
 
 type SessionPatchProjectionResult =
-  | { ok: true; entry: SessionEntry; validateModelSelection?: () => ErrorShape | undefined }
+  | {
+      ok: true;
+      entry: SessionEntry;
+      changedModel: boolean;
+      validateModelSelection?: () => ErrorShape | undefined;
+    }
   | { ok: false; error: ErrorShape };
 
 type SessionPatchPreparation =
@@ -494,6 +499,7 @@ function* projectSessionPatchSteps(
   if (typeof patch.nativeRuntimeConsent === "string" && typeof patch.model !== "string") {
     yield* loadPreparedModelCatalogForPatch();
   }
+  let changedModel = false;
   if ("model" in patch) {
     const statusModelPatch = isSessionStatusModelPatchOrigin();
     const agentModelFallback = isAgentSessionModelPatchOrigin()
@@ -625,7 +631,7 @@ function* projectSessionPatchSteps(
           `Model ${selection.provider}/${selection.model} requires agent harness "${harnessSelection.runtime}", but no enabled plugin provides it. Install and enable its plugin, restart the Gateway, then select the model again.`,
         );
       }
-      applyModelOverrideWithAuthProfileCompatibility({
+      changedModel = applyModelOverrideWithAuthProfileCompatibility({
         cfg,
         agentDir: resolveAgentDir(cfg, sessionAgentId),
         entry: next,
@@ -637,7 +643,7 @@ function* projectSessionPatchSteps(
           ? { metadataSnapshot: params.providerAuthMetadataSnapshot }
           : {}),
         markLiveSwitchPending: statusModelPatch || raw !== null,
-      });
+      }).updated;
       if (raw === null && !statusModelPatch) {
         delete next.liveModelSwitchPending;
       }
@@ -719,5 +725,10 @@ function* projectSessionPatchSteps(
     delete next.liveModelSwitchPending;
   }
 
-  return { ok: true, entry: next, ...(validateModelSelection ? { validateModelSelection } : {}) };
+  return {
+    ok: true,
+    entry: next,
+    changedModel,
+    ...(validateModelSelection ? { validateModelSelection } : {}),
+  };
 }

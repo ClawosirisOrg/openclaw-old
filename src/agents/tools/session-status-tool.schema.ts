@@ -5,6 +5,9 @@ export const SessionStatusToolSchema = Type.Object({
   user: requesterProfileSchema(),
   sessionKey: Type.Optional(Type.String()),
   model: Type.Optional(Type.String()),
+  thinkingLevel: Type.Optional(
+    Type.String({ description: "Thinking level override for the effective session model" }),
+  ),
   changesSince: Type.Optional(Type.Integer({ minimum: 0 })),
 });
 
@@ -74,6 +77,7 @@ export const SessionStatusOutputSchema = Type.Object(
     model: Type.Optional(Type.String()),
     modelProvider: Type.Optional(Type.String()),
     modelOverride: Type.Optional(Type.Union([Type.String(), Type.Null()])),
+    thinkingLevel: Type.Optional(Type.String()),
     origin: Type.Optional(SessionStatusOriginSchema),
     active: Type.Optional(SessionStatusDeliveryContextSchema),
     deliveryContext: Type.Optional(SessionStatusDeliveryContextSchema),

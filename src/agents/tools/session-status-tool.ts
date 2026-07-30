@@ -574,23 +574,7 @@ export function createSessionStatusTool(opts?: {
           const selectedAgentDir = resolveAgentDir(cfg, agentId);
           const selectedWorkspaceDir = resolveAgentWorkspaceDir(cfg, agentId);
           const modelRaw = readToolStringParam(params, "model");
-          let changedModel = false;
-          if (typeof modelRaw === "string") {
-            const patched = await patchSessionStatusModel({
-              cfg,
-              agentId,
-              agentDir: selectedAgentDir,
-              workspaceDir: selectedWorkspaceDir,
-              storePath,
-              raw: modelRaw,
-              resolved: scopedResolved,
-              metadataSnapshot: opts?.metadataSnapshot,
-              gatewayCall: gatewayScoped ? gatewayCall : undefined,
-            });
-            scopedResolved = patched.resolved;
-            changedModel = patched.changedModel;
-          }
-
+          const thinkingLevelRaw = readToolStringParam(params, "thinkingLevel");
           const liveSessionKeys = new Set(
             [
               opts?.runSessionKey,
@@ -614,6 +598,24 @@ export function createSessionStatusTool(opts?: {
                   ...(activeModelProvider ? { provider: activeModelProvider } : {}),
                 }
               : undefined;
+          let changedModel = false;
+          if (modelRaw !== undefined || thinkingLevelRaw !== undefined) {
+            const patched = await patchSessionStatusModel({
+              cfg,
+              agentId,
+              agentDir: selectedAgentDir,
+              workspaceDir: selectedWorkspaceDir,
+              storePath,
+              raw: modelRaw,
+              thinkingLevel: thinkingLevelRaw,
+              activeModelIdentity,
+              resolved: scopedResolved,
+              metadataSnapshot: opts?.metadataSnapshot,
+              gatewayCall: gatewayScoped ? gatewayCall : undefined,
+            });
+            scopedResolved = patched.resolved;
+            changedModel = patched.changedModel;
+          }
           const runtimeModelIdentity =
             activeModelIdentity ??
             resolveSessionModelIdentityRef(
@@ -748,6 +750,9 @@ export function createSessionStatusTool(opts?: {
                     : {}),
                   modelOverride: modelOverrideForResult,
                 }
+              : {}),
+            ...(thinkingLevelRaw !== undefined
+              ? { thinkingLevel: statusSessionEntry.thinkingLevel }
               : {}),
             statusText: visibleStatusText,
             ...routeDetails,
