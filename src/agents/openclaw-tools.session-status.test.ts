@@ -1148,7 +1148,7 @@ describe("session_status tool", () => {
     resetSessionStore({
       main: fixtureSession("s-acp-thinking-accept", { agentRuntimeOverride: "codex" }),
     });
-    resolveProviderThinkingProfileMock.mockImplementation(({ context }) => ({
+    resolveProviderThinkingProfileMock.mockImplementation(({ context } = {}) => ({
       levels: [
         { id: "off" },
         { id: "max" },
@@ -1184,7 +1184,7 @@ describe("session_status tool", () => {
     resetSessionStore({
       main: fixtureSession("s-acp-thinking-reject", { agentRuntimeOverride: "openclaw" }),
     });
-    resolveProviderThinkingProfileMock.mockImplementation(({ context }) => ({
+    resolveProviderThinkingProfileMock.mockImplementation(({ context } = {}) => ({
       levels: [
         { id: "off" },
         { id: "max" },
