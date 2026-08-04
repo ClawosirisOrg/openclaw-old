@@ -6,7 +6,10 @@ export const SessionStatusToolSchema = Type.Object({
   sessionKey: Type.Optional(Type.String()),
   model: Type.Optional(Type.String()),
   thinkingLevel: Type.Optional(
-    Type.String({ description: "Thinking level override for the effective session model" }),
+    Type.String({
+      description:
+        'Thinking level override for the effective session model; use "default" to reset',
+    }),
   ),
   changesSince: Type.Optional(Type.Integer({ minimum: 0 })),
 });

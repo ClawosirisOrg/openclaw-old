@@ -608,7 +608,6 @@ export function createSessionStatusTool(opts?: {
               storePath,
               raw: modelRaw,
               thinkingLevel: thinkingLevelRaw,
-              activeModelIdentity,
               resolved: scopedResolved,
               metadataSnapshot: opts?.metadataSnapshot,
               gatewayCall: gatewayScoped ? gatewayCall : undefined,
@@ -751,7 +750,7 @@ export function createSessionStatusTool(opts?: {
                   modelOverride: modelOverrideForResult,
                 }
               : {}),
-            ...(thinkingLevelRaw !== undefined
+            ...(thinkingLevelRaw !== undefined && statusSessionEntry.thinkingLevel !== undefined
               ? { thinkingLevel: statusSessionEntry.thinkingLevel }
               : {}),
             statusText: visibleStatusText,
